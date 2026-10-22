@@ -1,100 +1,123 @@
 # Interactive Shortest Path Simulator
 
-A small, interactive graph project built with **Python (Flask)** and **HTML, CSS, and JavaScript**. It uses **Dijkstra's algorithm** to find the minimum-total-weight path between two nodes.
+An interactive web application that visualizes the shortest path between
+two nodes in a weighted graph using **Dijkstra's algorithm**. The
+project is built with Python and Flask, with HTML, CSS, and JavaScript
+for the user interface.
+
+## Live Demo
+
+**Try the deployed application:**
+<https://shortest-path-simulator.onrender.com/>
+
+> Note: On a free hosting plan, the first visit after a period of
+> inactivity may take a little longer while the service wakes up.
+
+## Source Code
+
+GitHub repository:
+[sandipnakum/shortest-path-simulator](https://github.com/sandipnakum/shortest-path-simulator)
 
 ## Features
 
-- Start with a sample graph, or create your own.
-- Add nodes by selecting **Add node** and clicking the graph canvas.
-- Connect two nodes with a weighted, undirected edge.
-- Move nodes by dragging them in **Select / move** mode.
-- Choose a start node and a destination, then calculate the shortest path.
-- Highlight the best path and view its total cost and the order in which nodes were visited.
-- Remove nodes or edges, clear the graph, or reload the example graph.
-- The shortest-path calculation runs on the Python backend.
+-   Create and edit graph nodes and weighted edges.
+-   Select a start node and a destination node.
+-   Find the shortest path using Dijkstra's algorithm.
+-   View the calculated path and its total weight.
+-   Explore the graph through an interactive browser interface.
 
-## Requirements
+## Technologies Used
 
-- Python 3.10 or newer
-- pip
+-   **Python** --- application logic
+-   **Flask** --- Python web framework
+-   **HTML** --- page structure
+-   **CSS** --- styling and layout
+-   **JavaScript** --- interactive graph interface
+-   **Dijkstra's algorithm** --- shortest-path calculation
+-   **Render** --- web deployment
 
-## Run locally
+## Run Locally
 
-1. Extract the ZIP file, then open a terminal in the `shortest_path_simulator` folder.
-2. (Recommended) Create and activate a virtual environment:
+### 1. Requirements
 
-   **Windows**
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate
-   ```
+Install Python 3.10 or newer.
 
-   **macOS / Linux**
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
+### 2. Download the project
 
-3. Install dependencies:
+Clone the repository:
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+``` bash
+git clone https://github.com/sandipnakum/shortest-path-simulator.git
+cd shortest-path-simulator
+```
 
-4. Start the app:
+Alternatively, download the repository as a ZIP file from GitHub and
+extract it.
 
-   ```bash
-   python app.py
-   ```
+### 3. Install dependencies
 
-5. Open the local URL printed by Flask, usually **http://127.0.0.1:5000**.
+``` bash
+python -m pip install -r requirements.txt
+```
 
-## How to use it
+### 4. Start the application
 
-1. Pick **Select / move**, **Add node**, **Connect**, or **Delete** from the toolbar above the graph.
-2. To add a node, choose **Add node** and click an empty area of the graph.
-3. To connect nodes, choose **Connect**, click the first node and then the second node, and enter a weight. Edges are undirected and weights must be non-negative.
-4. Choose the start and destination from the dropdowns in the left panel.
-5. Click **Find shortest path**. The route is highlighted in green and the total weight is shown in the results panel.
-6. To delete an edge, choose **Delete** and click its line or weight label. To delete a node, choose **Delete** and click the node.
+``` bash
+python app.py
+```
 
-## Project structure
+Open the local address printed in the terminal. It is usually:
 
-```text
-shortest_path_simulator/
-├── app.py                 # Flask routes and Dijkstra algorithm
-├── requirements.txt       # Python dependency
-├── README.md              # Setup and usage instructions
+<http://127.0.0.1:5000>
+
+Keep the terminal open while using the local application.
+
+## How Dijkstra's Algorithm Works
+
+Dijkstra's algorithm finds a minimum-total-weight path from a starting
+node to other reachable nodes in a graph with **non-negative edge
+weights**.
+
+1.  Set the starting node's distance to zero and all other distances to
+    infinity.
+2.  Select the unvisited node with the smallest known distance.
+3.  Check its neighbouring nodes and update distances when a shorter
+    route is found.
+4.  Mark the selected node as visited and repeat.
+5.  Reconstruct the shortest path to the destination from the recorded
+    predecessor nodes.
+
+## Project Structure
+
+``` text
+shortest-path-simulator/
+├── app.py
+├── requirements.txt
+├── README.md
+├── run_windows.bat
 ├── templates/
-│   └── index.html         # Page structure
+│   └── index.html
 └── static/
-    ├── style.css          # Layout and visual styling
-    └── app.js             # Interactive SVG graph editor
+    ├── app.js
+    └── style.css
 ```
 
-## Algorithm overview
+## Deployment
 
-Dijkstra's algorithm keeps the best-known distance from the start node to every other node. It repeatedly visits the unprocessed node with the smallest known distance and relaxes its outgoing edges. When the destination is reached, predecessor links are followed backward to rebuild the route.
+The application is deployed on Render:
 
-With an adjacency list and a priority queue, the typical time complexity is **O((V + E) log V)**, where `V` is the number of vertices and `E` is the number of edges. Dijkstra's algorithm requires **non-negative edge weights**.
+<https://shortest-path-simulator.onrender.com/>
 
-## API
+The Render service uses the repository's `requirements.txt` to install
+dependencies and the start command `gunicorn app:app` to run the Flask
+application in production.
 
-`POST /api/shortest-path`
+## Author
 
-Example request body:
+**Sandip Nakum**
 
-```json
-{
-  "nodes": [{"id": "A"}, {"id": "B"}, {"id": "C"}],
-  "edges": [
-    {"from": "A", "to": "B", "weight": 4},
-    {"from": "B", "to": "C", "weight": 2},
-    {"from": "A", "to": "C", "weight": 9}
-  ],
-  "start": "A",
-  "end": "C"
-}
-```
+## License
 
-The example response has a path of `A → B → C` with total distance `6`.
+This project is intended for learning and educational demonstration. Add
+a license file if you want to specify formal reuse and distribution
+permissions.
