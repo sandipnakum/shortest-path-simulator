@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Build a weighted graph and explore shortest paths with Dijkstra's algorithm.">
+  <title>PathPilot — Shortest Path Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="PathPilot home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M7 24 14 9l11 14M7 24h18M14 9l4 8"/><circle cx="7" cy="24" r="3"/><circle cx="14" cy="9" r="3"/><circle cx="25" cy="23" r="3"/><circle cx="18" cy="17" r="2.5"/></svg>
+        </span>
+        <span>pathpilot<span class="brand-dot">.</span></span>
+      </a>
+      <div class="topbar-meta">
+        <span class="live-dot"></span>
+        <span>Interactive graph lab</span>
+        <span class="topbar-divider"></span>
+        <span class="tech-pill">PYTHON + HTML</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span> ALGORITHM PLAYGROUND</div>
+          <h1>Shortest path, <span>made visible.</span></h1>
+          <p>Build a weighted graph, choose where to start and end, and watch Dijkstra's algorithm find the most efficient route.</p>
+        </div>
+        <div class="algorithm-chip" aria-label="Algorithm: Dijkstra">
+          <div class="algo-icon"><svg viewBox="0 0 24 24"><path d="M4 18 9 6l5 12 6-12M4 18h16"/><circle cx="4" cy="18" r="2"/><circle cx="9" cy="6" r="2"/><circle cx="14" cy="18" r="2"/><circle cx="20" cy="6" r="2"/></svg></div>
+          <div><span class="chip-label">POWERED BY</span><strong>Dijkstra's algorithm</strong></div>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Shortest path workspace">
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <div>
+              <div class="section-kicker">CONFIGURATION</div>
+              <h2>Route planner</h2>
+            </div>
+            <span class="panel-number">01</span>
+          </div>
+
+          <div class="route-fields">
+            <label class="field-label" for="start-node">START NODE</label>
+            <div class="select-wrap start-select-wrap">
+              <span class="select-dot start-dot"></span>
+              <select id="start-node" aria-label="Start node"></select>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg>
+            </div>
+            <div class="route-connector"><span></span><span></span><span></span></div>
+            <label class="field-label" for="end-node">DESTINATION</label>
+            <div class="select-wrap end-select-wrap">
+              <span class="select-dot end-dot"></span>
+              <select id="end-node" aria-label="Destination node"></select>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg>
+            </div>
+          </div>
+
+          <button id="find-path" class="primary-button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 9 7l5 10 6-10M4 17h16"/><circle cx="4" cy="17" r="2"/><circle cx="9" cy="7" r="2"/><circle cx="14" cy="17" r="2"/><circle cx="20" cy="7" r="2"/></svg>
+            Find shortest path
+            <span class="button-arrow">↗</span>
+          </button>
+          <div id="status-message" class="status-message" role="status" aria-live="polite">Ready to explore your graph.</div>
+
+          <div class="panel-rule"></div>
+
+          <div class="result-heading">
+            <div class="section-kicker">RESULTS</div>
+            <span id="result-state" class="result-state">WAITING</span>
+          </div>
+          <div class="result-card">
+            <div class="result-metric-label">TOTAL PATH COST</div>
+            <div class="result-metric-row"><strong id="path-cost">—</strong><span>units</span></div>
+            <div class="result-card-rule"></div>
+            <div class="result-metric-label">BEST ROUTE</div>
+            <div id="path-sequence" class="path-sequence">Choose a route to begin</div>
+          </div>
+
+          <div class="visited-wrap">
+            <div class="visited-heading"><span>Nodes explored</span><span id="visited-count">0</span></div>
+            <div id="visited-list" class="visited-list"><span class="muted-small">Results will appear here.</span></div>
+          </div>
+
+          <div class="panel-footer">
+            <div class="footer-sparkle">✳</div>
+            <p><strong>Why Dijkstra?</strong><br>It finds the lowest-cost route when edge weights are non-negative.</p>
+          </div>
+        </aside>
+
+        <section class="graph-panel" aria-label="Graph editor">
+          <div class="graph-header">
+            <div>
+              <div class="section-kicker">CANVAS / GRAPH 01</div>
+              <h2>Your network <span class="editable-label">EDITABLE</span></h2>
+            </div>
+            <div class="graph-actions">
+              <button id="reset-example" class="text-button" title="Reload the example graph"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 7V3m0 0h-4m4 0-3 3a6 6 0 1 0 2 6"/></svg> Reset example</button>
+              <button id="clear-graph" class="icon-button" title="Clear graph" aria-label="Clear graph"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12M8 6V4h4v2m-6 0 1 10h6l1-10M9 9v4m2-4v4"/></svg></button>
+            </div>
+          </div>
+
+          <div class="toolbar" role="toolbar" aria-label="Graph editing tools">
+            <span class="toolbar-label">TOOLS</span>
+            <button class="tool-button active" data-mode="select" aria-pressed="true" title="Select and move nodes"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 2 11 9-5 .8-2.7 4.2L4 2Z"/></svg><span>Select / move</span></button>
+            <button class="tool-button" data-mode="add" aria-pressed="false" title="Click empty space to add a node"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M10 6.5v7M6.5 10h7"/></svg><span>Add node</span></button>
+            <button class="tool-button" data-mode="connect" aria-pressed="false" title="Click two nodes to connect them"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4" cy="15" r="2.2"/><circle cx="16" cy="5" r="2.2"/><path d="m6 13.4 8-6.8"/></svg><span>Connect</span></button>
+            <button class="tool-button" data-mode="delete" aria-pressed="false" title="Click a node or edge to delete it"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12M8 6V4h4v2m-6 0 1 10h6l1-10M9 9v4m2-4v4"/></svg><span>Delete</span></button>
+            <span id="tool-hint" class="tool-hint">Drag nodes to arrange your network.</span>
+          </div>
+
+          <div class="graph-canvas-wrap">
+            <div class="canvas-caption"><span class="canvas-live-dot"></span><span id="canvas-caption-text">SAMPLE NETWORK LOADED</span></div>
+            <svg id="graph-canvas" viewBox="0 0 900 560" role="application" aria-label="Interactive graph. Use the toolbar to add, connect, move, or delete nodes and edges." tabindex="0">
+              <defs>
+                <pattern id="small-grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M 28 0 L 0 0 0 28" fill="none" stroke="#e8edf2" stroke-width="1"/></pattern>
+                <filter id="path-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <rect width="900" height="560" fill="url(#small-grid)" />
+              <g id="edge-layer"></g>
+              <g id="node-layer"></g>
+            </svg>
+            <div id="empty-state" class="empty-state hidden"><div class="empty-state-icon">＋</div><strong>Your canvas is clear</strong><span>Choose “Add node” and click anywhere to begin.</span></div>
+          </div>
+
+          <div class="graph-legend">
+            <div class="legend-items">
+              <span class="legend-item"><i class="legend-dot normal-dot"></i> Node</span>
+              <span class="legend-item"><i class="legend-line"></i> Edge weight</span>
+              <span class="legend-item"><i class="legend-line best-line"></i> Shortest path</span>
+            </div>
+            <div class="graph-stats"><span><strong id="node-count">6</strong> nodes</span><span class="stats-divider">/</span><span><strong id="edge-count">8</strong> edges</span></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="how-section">
+        <div class="how-heading"><div class="section-kicker">QUICK GUIDE</div><h2>From graph to best route.</h2></div>
+        <div class="how-steps">
+          <article class="how-step"><div class="step-icon step-icon-one"><svg viewBox="0 0 24 24"><circle cx="6" cy="17" r="2.5"/><circle cx="12" cy="6" r="2.5"/><circle cx="19" cy="15" r="2.5"/><path d="m7.2 14.8 3.5-6.5m3.6-.3 3.3 5"/></svg></div><div><span>STEP 01</span><h3>Build a network</h3><p>Add nodes and connect them with weighted edges.</p></div></article>
+          <article class="how-step"><div class="step-icon step-icon-two"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h10M4 19h16"/><circle cx="17" cy="12" r="2"/></svg></div><div><span>STEP 02</span><h3>Choose endpoints</h3><p>Set the starting node and your destination.</p></div></article>
+          <article class="how-step"><div class="step-icon step-icon-three"><svg viewBox="0 0 24 24"><path d="m3 17 5-10 5 10 8-10M3 17h18"/><circle cx="3" cy="17" r="1.5"/><circle cx="8" cy="7" r="1.5"/><circle cx="13" cy="17" r="1.5"/><circle cx="21" cy="7" r="1.5"/></svg></div><div><span>STEP 03</span><h3>Reveal the route</h3><p>Run Dijkstra and see the lowest total cost highlighted.</p></div></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><span>PATHPILOT<span class="brand-dot">.</span> <span class="footer-muted">A shortest-path learning project</span></span><span>Built with Python Flask · HTML · CSS · JavaScript</span></footer>
+  </div>
+
+  <dialog id="weight-dialog" class="weight-dialog">
+    <form method="dialog" id="weight-form">
+      <div class="dialog-eyebrow">CREATE CONNECTION</div>
+      <h2>Set edge weight</h2>
+      <p id="connection-description">Choose the cost for this connection.</p>
+      <label for="edge-weight">WEIGHT (0 OR GREATER)</label>
+      <input id="edge-weight" type="number" min="0" step="any" value="4" required>
+      <div class="dialog-actions"><button type="button" id="cancel-weight" class="secondary-button">Cancel</button><button type="submit" id="save-weight" class="primary-button dialog-save">Add connection <span>↗</span></button></div>
+    </form>
+  </dialog>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
